@@ -1,12 +1,17 @@
-const express = require("express");
-const app = express();
+const { createApp } = require("./src/app");
+const { env } = require("./src/config/env");
+const { ensureVisitQrSchema } = require("./src/database/mysql");
 
-app.use(express.json());
+async function startServer() {
+  await ensureVisitQrSchema();
+  const app = createApp();
 
-app.get("/", (req, res) => {
-  res.json({ message: "Backend funcionando 🚀" });
-});
+  app.listen(env.PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${env.PORT}`);
+  });
+}
 
-app.listen(3000, () => {
-  console.log("Servidor corriendo en puerto 3000");
+startServer().catch((error) => {
+  console.error("No fue posible iniciar el servidor.", error);
+  process.exit(1);
 });
